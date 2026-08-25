@@ -29,7 +29,20 @@
   });
 
   /* ---------------- Calculator ---------------- */
-  var state = { leads: 120, atv: 2000, tier: "convert", breakdownOpen: false };
+  var state = { leads: 120, atv: 2000, tier: "own", breakdownOpen: false };
+
+  var FEES = {
+    convert: { small: 3000, mid: 4500, large: 7000 },
+    own:     { small: 4500, mid: 6500, large: 9500 }
+  };
+  function feeBand(leads) {
+    if (leads <= 100) return "small";
+    if (leads <= 200) return "mid";
+    return "large";
+  }
+  function feeFor(tier, leads) {
+    return FEES[tier][feeBand(leads)];
+  }
 
   var els = {
     leadsSlider: document.getElementById("leadsSlider"),
@@ -39,6 +52,8 @@
     atvValue: document.getElementById("atvValue"),
     tierConvert: document.getElementById("tierConvert"),
     tierOwn: document.getElementById("tierOwn"),
+    tierConvertPrice: document.getElementById("tierConvertPrice"),
+    tierOwnPrice: document.getElementById("tierOwnPrice"),
     netGain: document.getElementById("netGain"),
     breakeven: document.getElementById("breakeven"),
     beforeBookings: document.getElementById("beforeBookings"),
@@ -65,7 +80,7 @@
 
   function calc() {
     var leads = state.leads, atv = state.atv, tier = state.tier;
-    var fee = tier === "own" ? 4500 : 3000;
+    var fee = feeFor(tier, leads);
     var convBefore = Math.round(leads * 0.15);
     var convAfter = Math.round(leads * 0.28);
     var ghost = Math.round(leads * 0.15 * 0.30);
@@ -124,6 +139,8 @@
 
     els.tierConvert.classList.toggle("active", !isOwn);
     els.tierOwn.classList.toggle("active", isOwn);
+    animateNumber(els.tierConvertPrice, feeFor("convert", leads));
+    animateNumber(els.tierOwnPrice, feeFor("own", leads));
 
     animateNumber(els.netGain, Math.max(0, c.net));
     els.breakeven.textContent = c.breakeven;
