@@ -1,0 +1,108 @@
+/* ============================================================
+   FawrAI Design System — Tokens
+   Brand Book v2.0 · August 2026
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@200;300;400;500&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+:root {
+  /* ---------- Core palette (Brand Book §05, exact) ---------- */
+  --fawr-navy:       #0D2137;  /* Deep Navy — authority surfaces, headers, CTA cards */
+  --fawr-charcoal:   #2C2C2C;  /* All body text. Never pure black */
+  --fawr-sage:       #8A9E85;  /* Sub-headers, accents. Ink only */
+  --fawr-gold:       #D4AF6E;  /* One accent per viewport. Never overuse */
+  --fawr-offwhite:   #F8F5F0;  /* Page bg. Warmer than pure white */
+
+  /* ---------- Navy scale ---------- */
+  --fawr-navy-90:    #1A3149;  /* hover */
+  --fawr-navy-80:    #2A4560;  /* dividers */
+  --fawr-on-navy-dim:#9DB0C2;  /* text on navy */
+
+  /* ---------- Sage scale ---------- */
+  --fawr-sage-70:    #AEBDAB;  /* soft tint */
+  --fawr-sage-20:    #E6ECE4;  /* ghost bg */
+
+  /* ---------- Gold / warm scale ---------- */
+  --fawr-gold-90:    #C59F5D;  /* pressed */
+  --fawr-gold-20:    #F1E4CE;  /* highlight */
+  --fawr-offwhite-2: #EFEAE1;  /* panels */
+
+  /* ---------- Semantic ---------- */
+  --fg-1:            var(--fawr-charcoal);
+  --fg-on-navy:       var(--fawr-offwhite);
+  --fg-on-navy-dim:   var(--fawr-on-navy-dim);
+  --bg-page:          var(--fawr-offwhite);
+  --bg-panel:         var(--fawr-offwhite-2);
+  --bg-navy:          var(--fawr-navy);
+  --bg-navy-card:     #16273b;
+  --accent:           var(--fawr-gold);
+  --support:          var(--fawr-sage);
+
+  /* ---------- Type families ---------- */
+  --font-display: 'Geist', 'Helvetica Neue', Arial, sans-serif;
+  --font-body:    'Inter', 'Helvetica Neue', Arial, sans-serif;
+
+  /* ---------- Type scale (Brand Book §06, exact) ---------- */
+  --fs-display: 44px; --fw-display: 200; --tr-display: -0.025em;
+  --fs-h1:      40px; --fw-h1: 300;      --tr-h1: -0.022em;
+  --fs-h2:      28px; --fw-h2: 300;      --tr-h2: -0.018em;
+  --fs-h3:      20px; --fw-h3: 400;      --tr-h3: -0.012em;
+  --fs-body:    15px; --fw-body: 400;    --tr-body: 0em;
+  --fs-caption: 12.5px; --fw-caption: 300; --tr-caption: 0em;
+  --fs-eyebrow: 10px; --fw-eyebrow: 500; --tr-eyebrow: 0.22em;
+
+  /* ---------- Spacing (4px base) ---------- */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px;
+
+  /* ---------- Radii — restrained, premium ---------- */
+  --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-pill: 999px;
+
+  /* ---------- Elevation — soft, warm ---------- */
+  --shadow-sm: 0 2px 8px rgba(13, 33, 55, 0.06);
+  --shadow-md: 0 8px 24px rgba(13, 33, 55, 0.08);
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-body);
+  line-height: 1.55;
+  color: var(--fg-1);
+  background: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { font-family: var(--font-display); color: var(--fawr-navy); margin: 0; }
+h1 { font-size: var(--fs-h1); font-weight: var(--fw-h1); letter-spacing: var(--tr-h1); }
+h2 { font-size: var(--fs-h2); font-weight: var(--fw-h2); letter-spacing: var(--tr-h2); }
+h3 { font-size: var(--fs-h3); font-weight: var(--fw-h3); letter-spacing: var(--tr-h3); }
+
+.display {
+  font-family: var(--font-display);
+  font-size: var(--fs-display);
+  font-weight: var(--fw-display);
+  letter-spacing: var(--tr-display);
+  color: var(--fawr-navy);
+}
+
+p { font-size: var(--fs-body); color: var(--fg-1); margin: 0 0 var(--space-4); }
+
+.caption {
+  font-family: var(--font-body);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-caption);
+  font-style: italic;
+  color: var(--fawr-sage);
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--fs-eyebrow);
+  font-weight: var(--fw-eyebrow);
+  letter-spacing: var(--tr-eyebrow);
+  text-transform: uppercase;
+  color: var(--fawr-sage);
+}
+
+.gold-rule { width: 48px; height: 2px; background: var(--fawr-gold); border: 0; }
