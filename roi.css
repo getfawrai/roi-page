@@ -10,6 +10,7 @@ a { color: inherit; text-decoration: none; }
   .nav-wrap { padding: 0 20px !important; }
   .results-col { position: static !important; }
   h1 { font-size: 32px !important; }
+  .fw-logo-nav { height: 12px !important; }
 }
 input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 2px; background: rgba(13,33,55,0.12); border-radius: 2px; outline: none; cursor: pointer; }
 input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--fawr-navy); border: none; cursor: pointer; box-shadow: 0 0 0 4px rgba(13,33,55,0.1); transition: box-shadow 160ms ease, transform 160ms ease; }
@@ -44,6 +45,20 @@ input[type=range]:active::-moz-range-thumb { box-shadow: 0 0 0 7px rgba(13,33,55
 .roi-cta { transition: background 160ms ease, transform 160ms ease, box-shadow 160ms ease; transform: scale(1); }
 .roi-cta:hover { background: var(--fawr-navy-90); transform: scale(1.035) translateY(-2px); box-shadow: 0 12px 28px rgba(13,33,55,0.28); }
 .roi-cta:active { transform: scale(1.01) translateY(0); }
+
+.healthy-badge { transition: background 200ms ease, color 200ms ease; }
+.healthy-badge.low { background: rgba(224,138,138,0.14); color: #a35a5a; }
+.healthy-badge.healthy { background: var(--fawr-sage-20); color: var(--fawr-sage); }
+.healthy-badge.strong { background: rgba(212,175,110,0.15); color: var(--fawr-gold-90); }
+.healthy-badge strong, .healthy-badge #healthyRate { color: inherit; }
+
+.convert-toggle { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; background: none; border: none; cursor: pointer; padding: 12px 4px; margin-top: 10px; font-family: var(--font-body); font-size: 12px; color: var(--fawr-sage); text-align: center; }
+.convert-toggle:hover { color: var(--fawr-navy); }
+.convert-toggle-icon { display: inline-block; transition: transform 220ms ease; font-size: 10px; }
+.convert-toggle.open .convert-toggle-icon { transform: rotate(180deg); }
+.convert-panel { max-height: 0; overflow: hidden; transition: max-height 380ms cubic-bezier(.22,1,.36,1); }
+.convert-panel.open { max-height: 240px; }
+.convert-panel .tier-btn { margin-top: 4px; }
 
 #roi-gate { transition: opacity 320ms ease; }
 #roi-gate.unlocked { opacity: 0; pointer-events: none; }
