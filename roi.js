@@ -1,6 +1,24 @@
 (function () {
   "use strict";
 
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.documentElement.classList.add("js");
+
+  /* ---------------- Scroll reveal ---------------- */
+  (function () {
+    var revs = document.querySelectorAll(".reveal");
+    if (reduce || !("IntersectionObserver" in window)) {
+      revs.forEach(function (el) { el.classList.add("in"); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) { entry.target.classList.add("in"); io.unobserve(entry.target); }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+    revs.forEach(function (el) { io.observe(el); });
+  })();
+
   /* ---------------- Access gate ---------------- */
   var ACCESS_CODE = "getfawrai";
   var gate = document.getElementById("roi-gate");
@@ -34,7 +52,7 @@
     convert: { setup: [2000, 2500, 3500, 4500], monthly: [2500, 3500, 5000, 6500] }
   };
   var TIER_LABELS = ["Tier 1", "Tier 2", "Tier 3", "Tier 4"];
-  var TIER_RANGES = ["0–200", "201–400", "401–600", "601+"];
+  var TIER_RANGES = ["0-200", "201-400", "401-600", "601+"];
 
   function getTier(leads) {
     return leads <= 200 ? 0 : leads <= 400 ? 1 : leads <= 600 ? 2 : 3;
@@ -120,8 +138,52 @@
     feeMonthly: document.getElementById("feeMonthly"),
     breakdownToggle: document.getElementById("breakdownToggle"),
     breakdownPanel: document.getElementById("breakdownPanel"),
-    breakdownLabel: document.getElementById("breakdownLabel")
+    breakdownLabel: document.getElementById("breakdownLabel"),
+    flowBooked: document.getElementById("flowBooked"),
+    flowGap: document.getElementById("flowGap"),
+    flowNoshow: document.getElementById("flowNoshow"),
+    flowReten: document.getElementById("flowReten"),
+    flowLost: document.getElementById("flowLost"),
+    legBooked: document.getElementById("legBooked"),
+    legGap: document.getElementById("legGap"),
+    legNoshow: document.getElementById("legNoshow"),
+    legReten: document.getElementById("legReten"),
+    legLost: document.getElementById("legLost"),
+    legRetenRow: document.getElementById("legRetenRow")
   };
+
+  /* ---------------- Slider fill ---------------- */
+  function paintSlider(el) {
+    if (!el) return;
+    var min = +el.min, max = +el.max, v = +el.value;
+    var p = max > min ? ((v - min) / (max - min)) * 100 : 0;
+    el.style.setProperty("--p", p.toFixed(2) + "%");
+  }
+
+  /* ---------------- Flow visualisation ---------------- */
+  function setGrow(el, n) {
+    if (el) el.style.flexGrow = String(Math.max(0, n));
+  }
+  function renderFlow(leads, booked, c, isOwn) {
+    var reten = isOwn ? c.s3bk : 0;
+    var accounted = Math.min(leads, booked + c.s1bk + c.s2bk + reten);
+    var bookedShare = Math.min(booked, leads);
+    var lost = Math.max(0, leads - accounted);
+    var empty = leads <= 0;
+
+    setGrow(els.flowBooked, empty ? 0 : bookedShare);
+    setGrow(els.flowGap, c.s1bk);
+    setGrow(els.flowNoshow, c.s2bk);
+    setGrow(els.flowReten, reten);
+    setGrow(els.flowLost, empty ? 1 : lost);
+
+    animateNumber(els.legBooked, bookedShare);
+    animateNumber(els.legGap, c.s1bk);
+    animateNumber(els.legNoshow, c.s2bk);
+    animateNumber(els.legReten, reten);
+    animateNumber(els.legLost, lost);
+    if (els.legRetenRow) els.legRetenRow.hidden = !isOwn;
+  }
 
   function fmt(n) {
     return Math.round(n).toLocaleString("en-AE");
@@ -170,13 +232,13 @@
       els.healthyLabel.textContent = "add leads to see your booking rate";
       els.healthyBadge.classList.add("healthy");
     } else if (rate < HEALTHY_LOW) {
-      els.healthyLabel.textContent = "below the healthy range — large recovery opportunity";
+      els.healthyLabel.textContent = "below the healthy range · large recovery opportunity";
       els.healthyBadge.classList.add("low");
     } else if (rate <= HEALTHY_HIGH) {
       els.healthyLabel.textContent = "within the healthy range";
       els.healthyBadge.classList.add("healthy");
     } else {
-      els.healthyLabel.textContent = "a strong performer already — FawrAI still protects the experience for everyone who books, not just the leads you'd otherwise lose";
+      els.healthyLabel.textContent = "strong performer · FawrAI secures retention and no-shows";
       els.healthyBadge.classList.add("strong");
     }
 
@@ -194,7 +256,7 @@
     animateNumber(els.netGain, Math.max(0, netGain));
     els.breakeven.textContent = c.paybackBookings;
     els.surplusNote.textContent = c.surplusBookings >= 0
-      ? " — you're recovering " + c.surplusBookings + " more."
+      ? ". You're recovering " + c.surplusBookings + " more."
       : ".";
     els.roiMultiple.textContent = c.roi + "×";
 
@@ -202,6 +264,11 @@
     animateNumber(els.afterBookings, booked + c.recoveredBk);
     animateNumber(els.beforeRevenue, c.revWithout);
     animateNumber(els.afterRevenue, c.revWith);
+
+    renderFlow(leads, booked, c, isOwn);
+    paintSlider(els.leadsSlider);
+    paintSlider(els.bookedSlider);
+    paintSlider(els.priceSlider);
 
     animateNumber(els.bdGap, c.s1bk);
     animateNumber(els.bdNoshow, c.s2bk);

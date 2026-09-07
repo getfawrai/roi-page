@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FawrAI &middot; ROI calculator</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Model what FawrAI recovers from your clinic's own numbers: lead volume, current bookings and average treatment value.">
+
+<link rel="icon" type="image/png" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Inter:ital,wght@0,400;0,500;1,400&display=swap">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="roi.css">
+</head>
+<body class="roi">
+
+<!-- ACCESS GATE -->
+<div id="roi-gate" class="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+  <div class="gate__field" aria-hidden="true"></div>
+  <div class="gate__inner">
+    <img src="uploads/logo-light-cropped.png" alt="FawrAI" width="92" height="16" class="gate__logo">
+    <p class="eyebrow eyebrow--onnavy">ROI calculator &middot; prospect access</p>
+    <h1 id="gate-title">Enter your access code</h1>
+    <div class="gate__form">
+      <input id="gate-pw" type="password" placeholder="Access code" autocomplete="off" aria-label="Access code">
+      <div id="gate-error" class="gate__error" role="alert">That code isn&rsquo;t right. Try again.</div>
+      <button id="gate-submit" type="button" class="btn btn--gold">Continue</button>
+    </div>
+    <p class="gate__note">This page is shared with FawrAI prospects.<br>If you need the code, ask on your call.</p>
+  </div>
+</div>
+
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a class="nav__logo" href="https://fawrai.com/" aria-label="FawrAI home">
+      <img src="uploads/logo-dark.png" alt="FawrAI" width="96" height="16">
+    </a>
+    <a href="https://fawrai.com/" class="nav__back">&larr;&nbsp;&nbsp;fawrai.com</a>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="roi-hero" aria-labelledby="roi-title">
+    <div class="roi-hero__inner reveal">
+      <p class="eyebrow eyebrow--onnavy">ROI calculator</p>
+      <h1 id="roi-title">Honest math,<br><span>on your clinic&rsquo;s numbers.</span></h1>
+      <p class="roi-hero__lead">Move the three sliders. Watch the month re-sort in real time: what books on its own, what FawrAI carries to a booking, and what never gets reached.</p>
+    </div>
+  </section>
+
+  <section class="calc" aria-label="ROI calculator">
+    <div class="calc__grid">
+
+      <!-- INPUTS -->
+      <div class="calc__inputs">
+
+        <div class="field reveal">
+          <div class="field__head">
+            <div>
+              <p class="label"><span>01</span>Monthly leads</p>
+              <div id="leadsValue" class="field__num">200</div>
+            </div>
+            <span id="tierBadge" class="tag">Tier 1</span>
+          </div>
+          <input id="leadsSlider" type="range" min="0" max="800" step="10" value="200" aria-label="Monthly leads">
+          <div class="ticks"><span>0</span><span>400</span><span>800</span></div>
+        </div>
+
+        <div class="field reveal">
+          <div class="field__head">
+            <div>
+              <p class="label"><span>02</span>Currently booking</p>
+              <div id="bookedValue" class="field__num">60</div>
+            </div>
+            <span class="field__unit">bookings / mo</span>
+          </div>
+          <input id="bookedSlider" type="range" min="0" max="800" step="5" value="60" aria-label="Current bookings per month">
+          <div class="ticks"><span>0</span><span>400</span><span>800</span></div>
+          <p id="healthyBadge" class="healthy">
+            <span id="healthyRate">30%</span> of leads booked &middot; <span id="healthyLabel">within the healthy range</span>
+          </p>
+        </div>
+
+        <div class="field reveal">
+          <div class="field__head">
+            <div>
+              <p class="label"><span>03</span>Average treatment value</p>
+              <div class="field__num">AED&nbsp;<span id="priceValue">1,500</span></div>
+            </div>
+            <span class="field__unit">per booking</span>
+          </div>
+          <input id="priceSlider" type="range" min="500" max="10000" step="100" value="1500" aria-label="Average treatment value in AED">
+          <div class="ticks"><span>AED 500</span><span>AED 5,000</span><span>AED 10,000</span></div>
+        </div>
+
+        <div class="field field--plan reveal">
+          <p class="label"><span>04</span>Choose your plan</p>
+          <button id="tierOwn" class="plan active" data-tier="own" type="button">
+            <span class="plan__row">
+              <span class="plan__name">Own</span>
+              <span class="plan__rec">Recommended</span>
+            </span>
+            <span class="plan__desc">Convert &middot; No-shows &middot; Retention</span>
+            <span class="plan__price">AED&nbsp;<span id="tierOwnPrice" class="roi-big-num">7,000</span><i> / mo</i></span>
+            <span class="plan__setup">+ AED <span id="tierOwnSetup" class="roi-big-num">4,500</span> setup</span>
+          </button>
+
+          <button id="convertToggle" class="plan__toggle" type="button">
+            <span>Need something lighter? See the Convert plan</span>
+            <span id="convertToggleIcon" class="plan__toggle-icon">&#9662;</span>
+          </button>
+          <div id="convertPanel" class="plan__panel">
+            <button id="tierConvert" class="plan" data-tier="convert" type="button">
+              <span class="plan__row"><span class="plan__name">Convert</span></span>
+              <span class="plan__desc">Lead gap &middot; No-shows</span>
+              <span class="plan__price">AED&nbsp;<span id="tierConvertPrice" class="roi-big-num">5,000</span><i> / mo</i></span>
+              <span class="plan__setup">+ AED <span id="tierConvertSetup" class="roi-big-num">3,500</span> setup</span>
+            </button>
+          </div>
+        </div>
+
+        <p class="calc__model">
+          <strong>Conservative model.</strong> FawrAI recovers 20% of the gap between leads and bookings, reschedules 35% of no-shows (assumed at 20% of bookings), and, on Own, re-engages 10% of attended clients for repeat visits. Results usually improve as the system optimises over time. The figures also assume your lead generation is sound: real, relevant enquiries coming in.
+        </p>
+      </div>
+
+      <!-- RESULTS -->
+      <aside class="calc__results" aria-label="Projected result">
+        <div class="result-panel reveal">
+          <p class="eyebrow eyebrow--onnavy">Your projected net gain</p>
+          <div class="result-panel__num">AED&nbsp;<span id="netGain" class="roi-big-num">0</span></div>
+          <p class="result-panel__sub">net monthly gain after subscription</p>
+          <div class="result-panel__foot">
+            <p>Break-even at <strong id="breakeven">0</strong> extra bookings<span id="surplusNote">.</span></p>
+            <p class="result-panel__roi"><span id="roiMultiple">0&times;</span> monthly return on the subscription.</p>
+          </div>
+        </div>
+
+        <figure class="flow reveal" aria-labelledby="flow-cap">
+          <div class="flow__track" role="img" aria-label="A stacked bar showing this month's leads split into what books on its own, what FawrAI recovers, and what is never reached.">
+            <div class="flow__seg flow__seg--booked" id="flowBooked"></div>
+            <div class="flow__seg flow__seg--gap flow__seg--worked" id="flowGap"></div>
+            <div class="flow__seg flow__seg--noshow flow__seg--worked" id="flowNoshow"></div>
+            <div class="flow__seg flow__seg--reten flow__seg--worked" id="flowReten"></div>
+            <div class="flow__seg flow__seg--lost" id="flowLost"></div>
+          </div>
+          <ul class="flow__legend">
+            <li><i class="sw sw--booked"></i><span>Books without FawrAI</span><b id="legBooked" class="roi-big-num">0</b></li>
+            <li><i class="sw sw--gap"></i><span>Lead-gap recovery</span><b id="legGap" class="roi-big-num">0</b></li>
+            <li><i class="sw sw--noshow"></i><span>No-show recovery</span><b id="legNoshow" class="roi-big-num">0</b></li>
+            <li id="legRetenRow"><i class="sw sw--reten"></i><span>Retention <em>Own</em></span><b id="legReten" class="roi-big-num">0</b></li>
+            <li><i class="sw sw--lost"></i><span>Never reached</span><b id="legLost" class="roi-big-num">0</b></li>
+          </ul>
+          <figcaption id="flow-cap" class="delta">
+            <b id="beforeBookings" class="roi-big-num">0</b> booked now
+            <span class="delta__arw" aria-hidden="true">&rarr;</span>
+            <b id="afterBookings" class="roi-big-num">0</b> with FawrAI
+            <span class="delta__rev">AED <span id="beforeRevenue" class="roi-big-num">0</span> &rarr; AED <span id="afterRevenue" class="roi-big-num">0</span> / mo</span>
+          </figcaption>
+        </figure>
+
+        <div class="drawer reveal">
+          <button id="breakdownToggle" class="drawer__toggle" type="button">
+            <span class="label label--sm">Where the bookings come from</span>
+            <span id="breakdownLabel" class="drawer__state">Show</span>
+          </button>
+          <div id="breakdownPanel" class="drawer__panel">
+            <div class="drawer__body">
+              <div class="row"><span>Lead gap recovery</span><span class="row__v">+<span id="bdGap" class="roi-big-num">0</span></span></div>
+              <div class="row"><span>No-show recovery</span><span class="row__v">+<span id="bdNoshow" class="roi-big-num">0</span></span></div>
+              <div id="ownRows" class="own-rows" hidden>
+                <div class="row"><span>Client retention <i class="tag-own">Own</i></span><span class="row__v">+<span id="bdRetention" class="roi-big-num">0</span></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fees reveal">
+          <div class="row"><span>Setup fee <i>one-time</i></span><span class="row__v">AED <span id="feeSetup" class="roi-big-num">0</span></span></div>
+          <div class="row"><span>Subscription <i>monthly</i></span><span class="row__v">AED <span id="feeMonthly" class="roi-big-num">0</span></span></div>
+        </div>
+
+        <p id="ownNote" class="own-note" hidden>Own compounds. Retention gains grow each month as FawrAI builds your client history.</p>
+
+        <a href="index.html#contact" class="btn btn--primary calc__cta reveal">Book a consultation</a>
+      </aside>
+    </div>
+
+    <p class="disclaimer reveal">
+      <strong>Projected figures only.</strong> These estimate what a settled, optimised system could produce over time, not results in the first weeks, based on the numbers you enter and the conservative model described above. It is not a forecast, a quote, or a guarantee of results. Actual performance varies with your clinic&rsquo;s treatments, pricing, capacity, team and market. Nothing shown here forms part of any agreement.
+    </p>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="foot__inner">
+    <img src="uploads/logo-light-cropped.png" alt="FawrAI" width="88" height="15" class="foot__logo">
+    <p class="foot__meta">
+      <a href="https://fawrai.com/">fawrai.com</a>
+      <span>Dubai, UAE</span>
+      <span>&copy; 2026 FawrAI</span>
+    </p>
+  </div>
+</footer>
+
+<script src="roi.js" defer></script>
+</body>
+</html>
