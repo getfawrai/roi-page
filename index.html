@@ -3,214 +3,212 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FawrAI ROI Calculator</title>
+<title>FawrAI &middot; ROI calculator</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Model what FawrAI recovers from your clinic's own numbers: lead volume, current bookings and average treatment value.">
+
 <link rel="icon" type="image/png" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="colors_and_type.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Inter:ital,wght@0,400;0,500;1,400&display=swap">
+<link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="roi.css">
 </head>
-<body>
-
-<!-- NAV -->
-<div class="nav-wrap" style="padding: 0 48px; height: 64px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(13,33,55,0.07); background: var(--fawr-offwhite);">
-  <a href="https://fawrai.com" aria-label="FawrAI home"><img src="logo-dark.png?v=2" alt="FawrAI" class="fw-logo-nav" style="height:20px;width:auto;"></a>
-  <a href="https://fawrai.com" style="font-family: var(--font-body); font-size: 12px; color: var(--fawr-sage); letter-spacing: 0.04em;">&larr; fawrai.com</a>
-</div>
+<body class="roi">
 
 <!-- ACCESS GATE -->
-<div id="roi-gate" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--fawr-navy); display: flex; align-items: center; justify-content: center; z-index: 9999; overflow: hidden;">
-  <div style="position: absolute; inset: 0; background-image: linear-gradient(rgba(212,175,110,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(212,175,110,0.03) 1px, transparent 1px); background-size: 72px 72px; pointer-events: none;"></div>
-  <div style="position: relative; width: 100%; max-width: 400px; padding: 0 24px; text-align: center;">
-    <img src="logo-light.png?v=2" alt="FawrAI" style="height:20px;width:auto;margin-bottom:40px;">
-    <div class="eyebrow" style="color: var(--fawr-sage); margin-bottom: 16px;">ROI Calculator</div>
-    <h1 style="font-size: 20px; font-weight: 200; letter-spacing: -0.02em; line-height: 1.15; color: var(--fawr-offwhite); margin-bottom: 32px;">Enter your access code to continue.</h1>
-    <div style="display: flex; flex-direction: column; gap: 12px;">
-      <input id="gate-pw" type="password" placeholder="Access code" autocomplete="off" style="font-family: var(--font-body); font-size: 15px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius-sm); padding: 13px 18px; color: var(--fawr-offwhite); width: 100%; outline: none; text-align: center; letter-spacing: 0.1em;">
-      <div id="gate-error" style="display: none; font-family: var(--font-body); font-size: 12px; color: #e08a8a;">That code isn't right. Try again.</div>
-      <button id="gate-submit" style="font-family: var(--font-body); font-size: 14px; font-weight: 500; background: var(--fawr-gold); color: var(--fawr-navy); border: none; border-radius: var(--radius-sm); padding: 13px 24px; cursor: pointer; width: 100%;">Continue</button>
+<div id="roi-gate" class="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+  <div class="gate__field" aria-hidden="true"></div>
+  <div class="gate__inner">
+    <img src="logo-light-cropped.png" alt="FawrAI" width="92" height="16" class="gate__logo">
+    <p class="eyebrow eyebrow--onnavy">ROI calculator &middot; prospect access</p>
+    <h1 id="gate-title">Enter your access code</h1>
+    <div class="gate__form">
+      <input id="gate-pw" type="password" placeholder="Access code" autocomplete="off" aria-label="Access code">
+      <div id="gate-error" class="gate__error" role="alert">That code isn&rsquo;t right. Try again.</div>
+      <button id="gate-submit" type="button" class="btn btn--gold">Continue</button>
     </div>
-    <p style="margin-top: 24px; font-family: var(--font-body); font-size: 11px; color: rgba(255,255,255,0.25); font-style: italic;">This page is for FawrAI prospects only.</p>
+    <p class="gate__note">This page is shared with FawrAI prospects.<br>If you need the code, ask on your call.</p>
   </div>
 </div>
 
-<!-- HERO HEADER -->
-<div style="background: var(--fawr-navy); padding: 72px 48px 64px; position: relative; overflow: hidden;">
-  <div style="position: absolute; inset: 0; background-image: linear-gradient(rgba(212,175,110,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(212,175,110,0.03) 1px, transparent 1px); background-size: 72px 72px; pointer-events: none;"></div>
-  <div class="hero-inner" style="max-width: 1080px; margin: 0 auto; position: relative; padding: 0;">
-    <div class="eyebrow" style="color: var(--fawr-sage); margin-bottom: 20px;">ROI Calculator</div>
-    <h1 style="font-size: 48px; font-weight: 200; letter-spacing: -0.03em; line-height: 1.08; color: var(--fawr-offwhite); margin-bottom: 16px;">Honest math.<br>Your clinic's numbers.</h1>
-    <div style="width: 40px; height: 1px; background: var(--fawr-gold); margin-bottom: 24px;"></div>
-    <p style="font-size: 15px; line-height: 1.65; color: var(--fg-on-navy-dim); font-family: var(--font-body); max-width: 520px;">Slide your monthly leads and current bookings, choose a plan, <br>and see what FawrAI recovers in real time.</p>
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a class="nav__logo" href="https://fawrai.com/" aria-label="FawrAI home">
+      <img src="logo-dark.png" alt="FawrAI" width="96" height="16">
+    </a>
+    <a href="https://fawrai.com/" class="nav__back">&larr;&nbsp;&nbsp;fawrai.com</a>
   </div>
-</div>
+</header>
 
-<!-- CALCULATOR -->
-<div class="calc-wrap" style="max-width: 1080px; margin: 0 auto; padding: 56px 48px 96px;">
-  <div class="calc-grid" style="display: grid; grid-template-columns: 1fr 360px; gap: 32px; align-items: start;">
+<main id="main">
 
-    <!-- LEFT: Inputs -->
-    <div style="display: flex; flex-direction: column; gap: 24px;">
+  <section class="roi-hero" aria-labelledby="roi-title">
+    <div class="roi-hero__inner reveal">
+      <p class="eyebrow eyebrow--onnavy">ROI calculator</p>
+      <h1 id="roi-title">Honest math,<br><span>on your clinic&rsquo;s numbers.</span></h1>
+      <p class="roi-hero__lead">Move the three sliders. Watch the month re-sort in real time: what books on its own, what FawrAI carries to a booking, and what never gets reached.</p>
+    </div>
+  </section>
 
-      <div class="input-card">
-        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px;">
-          <div>
-            <div class="eyebrow" style="margin-bottom: 8px;">Monthly leads</div>
-            <div id="leadsValue" class="roi-big-num" style="font-family: var(--font-display); font-size: 44px; font-weight: 200; color: var(--fawr-navy); letter-spacing: -0.025em;">200</div>
+  <section class="calc" aria-label="ROI calculator">
+    <div class="calc__grid">
+
+      <!-- INPUTS -->
+      <div class="calc__inputs">
+
+        <div class="field reveal">
+          <div class="field__head">
+            <div>
+              <p class="label"><span>01</span>Monthly leads</p>
+              <div id="leadsValue" class="field__num">200</div>
+            </div>
+            <span id="tierBadge" class="tag">Tier 1</span>
           </div>
-          <div id="tierBadge" class="pill" style="border-color: rgba(138,158,133,0.3); color: var(--fawr-sage);">Tier 1</div>
+          <input id="leadsSlider" type="range" min="0" max="800" step="10" value="200" aria-label="Monthly leads">
+          <div class="ticks"><span>0</span><span>400</span><span>800</span></div>
         </div>
-        <input id="leadsSlider" type="range" min="0" max="800" step="10" value="200">
-        <div style="display: flex; justify-content: space-between; margin-top: 8px;">
-          <span style="font-family: var(--font-body); font-size: 10px; color: rgba(13,33,55,0.3);">0</span>
-          <span style="font-family: var(--font-body); font-size: 10px; color: rgba(13,33,55,0.3);">400</span>
-          <span style="font-family: var(--font-body); font-size: 10px; color: rgba(13,33,55,0.3);">800</span>
-        </div>
-      </div>
 
-      <div class="input-card">
-        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px;">
-          <div>
-            <div class="eyebrow" style="margin-bottom: 8px;">Currently booking</div>
-            <div id="bookedValue" class="roi-big-num" style="font-family: var(--font-display); font-size: 44px; font-weight: 200; color: var(--fawr-navy); letter-spacing: -0.025em;">60</div>
+        <div class="field reveal">
+          <div class="field__head">
+            <div>
+              <p class="label"><span>02</span>Currently booking</p>
+              <div id="bookedValue" class="field__num">60</div>
+            </div>
+            <span class="field__unit">bookings / mo</span>
           </div>
-          <div style="font-family: var(--font-body); font-size: 11px; color: var(--fawr-sage);">bookings / mo</div>
+          <input id="bookedSlider" type="range" min="0" max="800" step="5" value="60" aria-label="Current bookings per month">
+          <div class="ticks"><span>0</span><span>400</span><span>800</span></div>
+          <p id="healthyBadge" class="healthy">
+            <span id="healthyRate">30%</span> of leads booked &middot; <span id="healthyLabel">within the healthy range</span>
+          </p>
         </div>
-        <input id="bookedSlider" type="range" min="0" max="800" step="5" value="60">
-        <div style="display: flex; justify-content: space-between; margin-top: 8px;">
-          <span style="font-family: var(--font-body); font-size: 10px; color: rgba(13,33,55,0.3);">0</span>
-          <span style="font-family: var(--font-body); font-size: 10px; color: rgba(13,33,55,0.3);">400</span>
-          <span style="font-family: var(--font-body); font-size: 10px; color: rgba(13,33,55,0.3);">800</span>
-        </div>
-        <div id="healthyBadge" class="healthy-badge" style="margin-top: 14px; padding: 10px 14px; border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 12px; line-height: 1.5;">
-          <span id="healthyRate">30%</span> of leads booked &mdash; <span id="healthyLabel">within the healthy range</span>
-        </div>
-      </div>
 
-      <div class="input-card">
-        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px;">
-          <div>
-            <div class="eyebrow" style="margin-bottom: 8px;">Average treatment value</div>
-            <div style="font-family: var(--font-display); font-size: 44px; font-weight: 200; color: var(--fawr-navy); letter-spacing: -0.025em;">AED <span id="priceValue" class="roi-big-num">1,500</span></div>
+        <div class="field reveal">
+          <div class="field__head">
+            <div>
+              <p class="label"><span>03</span>Average treatment value</p>
+              <div class="field__num">AED&nbsp;<span id="priceValue">1,500</span></div>
+            </div>
+            <span class="field__unit">per booking</span>
           </div>
-          <div style="font-family: var(--font-body); font-size: 11px; color: var(--fawr-sage);">per booking</div>
+          <input id="priceSlider" type="range" min="500" max="10000" step="100" value="1500" aria-label="Average treatment value in AED">
+          <div class="ticks"><span>AED 500</span><span>AED 5,000</span><span>AED 10,000</span></div>
         </div>
-        <input id="priceSlider" type="range" min="500" max="10000" step="100" value="1500">
-        <div style="display: flex; justify-content: space-between; margin-top: 8px;">
-          <span style="font-family: var(--font-body); font-size: 10px; color: rgba(13,33,55,0.3);">AED 500</span>
-          <span style="font-family: var(--font-body); font-size: 10px; color: rgba(13,33,55,0.3);">AED 5,000</span>
-          <span style="font-family: var(--font-body); font-size: 10px; color: rgba(13,33,55,0.3);">AED 10,000</span>
-        </div>
-      </div>
 
-      <div>
-        <div class="eyebrow" style="margin-bottom: 14px;">Choose your plan</div>
-        <button id="tierOwn" class="tier-btn active" data-tier="own" style="width: 100%; text-align: left;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-            <div style="font-family: var(--font-display); font-size: 16px; font-weight: 400; color: var(--fawr-navy);">Own</div>
-            <span class="pill" style="border-color: var(--fawr-gold); color: var(--fawr-navy); background: rgba(212,175,110,0.15);">Recommended</span>
-          </div>
-          <div style="font-family: var(--font-body); font-size: 11px; color: var(--fawr-charcoal); opacity: 0.5; margin-bottom: 14px;">Convert + No-shows + Retention</div>
-          <div style="font-family: var(--font-display); font-size: 20px; font-weight: 200; color: var(--fawr-navy);">AED <span id="tierOwnPrice" class="roi-big-num">7,000</span><span style="font-size: 13px; color: var(--fawr-sage);"> / mo</span></div>
-          <div style="font-family: var(--font-body); font-size: 10.5px; color: var(--fawr-sage); margin-top: 2px;">+ AED <span id="tierOwnSetup" class="roi-big-num">4,500</span> setup</div>
-        </button>
-
-        <button id="convertToggle" class="convert-toggle" type="button">
-          <span>Need something lighter? See the Convert plan</span>
-          <span id="convertToggleIcon" class="convert-toggle-icon">&#9662;</span>
-        </button>
-        <div id="convertPanel" class="convert-panel">
-          <button id="tierConvert" class="tier-btn" data-tier="convert" style="width: 100%; text-align: left;">
-            <div style="font-family: var(--font-display); font-size: 16px; font-weight: 400; color: var(--fawr-navy); margin-bottom: 4px;">Convert</div>
-            <div style="font-family: var(--font-body); font-size: 11px; color: var(--fawr-charcoal); opacity: 0.5; margin-bottom: 14px;">Lead gap + no-shows</div>
-            <div style="font-family: var(--font-display); font-size: 20px; font-weight: 200; color: var(--fawr-navy);">AED <span id="tierConvertPrice" class="roi-big-num">5,000</span><span style="font-size: 13px; color: var(--fawr-sage);"> / mo</span></div>
-            <div style="font-family: var(--font-body); font-size: 10.5px; color: var(--fawr-sage); margin-top: 2px;">+ AED <span id="tierConvertSetup" class="roi-big-num">3,500</span> setup</div>
+        <div class="field field--plan reveal">
+          <p class="label"><span>04</span>Choose your plan</p>
+          <button id="tierOwn" class="plan active" data-tier="own" type="button">
+            <span class="plan__row">
+              <span class="plan__name">Own</span>
+              <span class="plan__rec">Recommended</span>
+            </span>
+            <span class="plan__desc">Convert &middot; No-shows &middot; Retention</span>
+            <span class="plan__price">AED&nbsp;<span id="tierOwnPrice" class="roi-big-num">7,000</span><i> / mo</i></span>
+            <span class="plan__setup">+ AED <span id="tierOwnSetup" class="roi-big-num">4,500</span> setup</span>
           </button>
+
+          <button id="convertToggle" class="plan__toggle" type="button">
+            <span>Need something lighter? See the Convert plan</span>
+            <span id="convertToggleIcon" class="plan__toggle-icon">&#9662;</span>
+          </button>
+          <div id="convertPanel" class="plan__panel">
+            <button id="tierConvert" class="plan" data-tier="convert" type="button">
+              <span class="plan__row"><span class="plan__name">Convert</span></span>
+              <span class="plan__desc">Lead gap &middot; No-shows</span>
+              <span class="plan__price">AED&nbsp;<span id="tierConvertPrice" class="roi-big-num">5,000</span><i> / mo</i></span>
+              <span class="plan__setup">+ AED <span id="tierConvertSetup" class="roi-big-num">3,500</span> setup</span>
+            </button>
+          </div>
         </div>
+
+        <p class="calc__model">
+          <strong>Conservative model.</strong> FawrAI recovers 20% of the gap between leads and bookings, reschedules 35% of no-shows (assumed at 20% of bookings), and, on Own, re-engages 10% of attended clients for repeat visits. Results usually improve as the system optimises over time. The figures also assume your lead generation is sound: real, relevant enquiries coming in.
+        </p>
       </div>
 
-      <div style="background: var(--fawr-sage-20); border-radius: var(--radius-md); padding: 16px 20px;">
-        <p style="font-family: var(--font-body); font-size: 11.5px; line-height: 1.65; color: var(--fawr-charcoal); margin: 0;"><strong style="color: var(--fawr-navy); font-weight: 500;">Conservative model.</strong> FawrAI recovers 20% of the gap between leads and bookings, reschedules 35% of no-shows (assumed at 20% of bookings), and &mdash; on Own &mdash; re-engages 10% of attended clients for repeat visits. Real results typically exceed these numbers as the system learns your clinic.</p>
-      </div>
-    </div>
-
-    <!-- RIGHT: Results -->
-    <div class="results-col" style="display: flex; flex-direction: column; gap: 14px; position: sticky; top: 24px;">
-
-      <div style="background: var(--fawr-navy); border-radius: var(--radius-lg); padding: 28px 28px 24px;">
-        <div class="eyebrow" style="color: var(--fawr-sage); margin-bottom: 10px;">Your projected net gain</div>
-        <div style="font-family: var(--font-display); font-size: 52px; font-weight: 200; color: var(--fawr-offwhite); letter-spacing: -0.03em; line-height: 1;">AED <span id="netGain" class="roi-big-num">0</span></div>
-        <div style="font-family: var(--font-body); font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 6px;">net monthly gain after subscription</div>
-        <div style="margin-top: 18px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.08);">
-          <div style="font-family: var(--font-body); font-size: 12px; color: rgba(255,255,255,0.6);">Break-even at <strong id="breakeven" style="color: var(--fawr-gold);">0</strong> extra bookings<span id="surplusNote">.</span></div>
-          <div style="font-family: var(--font-body); font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 4px;"><span id="roiMultiple">0&times;</span> monthly return on the subscription.</div>
+      <!-- RESULTS -->
+      <aside class="calc__results" aria-label="Projected result">
+        <div class="result-panel reveal">
+          <p class="eyebrow eyebrow--onnavy">Your projected net gain</p>
+          <div class="result-panel__num">AED&nbsp;<span id="netGain" class="roi-big-num">0</span></div>
+          <p class="result-panel__sub">net monthly gain after subscription</p>
+          <div class="result-panel__foot">
+            <p>Break-even at <strong id="breakeven">0</strong> extra bookings<span id="surplusNote">.</span></p>
+            <p class="result-panel__roi"><span id="roiMultiple">0&times;</span> monthly return on the subscription.</p>
+          </div>
         </div>
-      </div>
 
-      <div class="before-after-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <div style="background: var(--fawr-offwhite-2); border: 1px solid rgba(13,33,55,0.07); border-radius: var(--radius-md); padding: 20px;">
-          <div class="eyebrow" style="color: rgba(13,33,55,0.35); margin-bottom: 8px;">Before</div>
-          <div id="beforeBookings" class="roi-big-num" style="font-family: var(--font-display); font-size: 28px; font-weight: 200; color: var(--fawr-charcoal); letter-spacing: -0.02em;">0</div>
-          <div style="font-family: var(--font-body); font-size: 10.5px; color: var(--fawr-sage); margin-top: 3px;">bookings / mo</div>
-          <div style="margin-top: 10px; font-family: var(--font-body); font-size: 12px; color: var(--fawr-charcoal);">AED <span id="beforeRevenue" class="roi-big-num">0</span></div>
-        </div>
-        <div style="background: var(--fawr-offwhite-2); border: 1px solid rgba(13,33,55,0.12); border-radius: var(--radius-md); padding: 20px;">
-          <div class="eyebrow" style="color: var(--fawr-sage); margin-bottom: 8px;">With FawrAI</div>
-          <div id="afterBookings" class="roi-big-num" style="font-family: var(--font-display); font-size: 28px; font-weight: 200; color: var(--fawr-navy); letter-spacing: -0.02em;">0</div>
-          <div style="font-family: var(--font-body); font-size: 10.5px; color: var(--fawr-sage); margin-top: 3px;">bookings / mo</div>
-          <div style="margin-top: 10px; font-family: var(--font-body); font-size: 12px; color: var(--fawr-navy); font-weight: 500;">AED <span id="afterRevenue" class="roi-big-num">0</span></div>
-        </div>
-      </div>
+        <figure class="flow reveal" aria-labelledby="flow-cap">
+          <div class="flow__track" role="img" aria-label="A stacked bar showing this month's leads split into what books on its own, what FawrAI recovers, and what is never reached.">
+            <div class="flow__seg flow__seg--booked" id="flowBooked"></div>
+            <div class="flow__seg flow__seg--gap flow__seg--worked" id="flowGap"></div>
+            <div class="flow__seg flow__seg--noshow flow__seg--worked" id="flowNoshow"></div>
+            <div class="flow__seg flow__seg--reten flow__seg--worked" id="flowReten"></div>
+            <div class="flow__seg flow__seg--lost" id="flowLost"></div>
+          </div>
+          <ul class="flow__legend">
+            <li><i class="sw sw--booked"></i><span>Books without FawrAI</span><b id="legBooked" class="roi-big-num">0</b></li>
+            <li><i class="sw sw--gap"></i><span>Lead-gap recovery</span><b id="legGap" class="roi-big-num">0</b></li>
+            <li><i class="sw sw--noshow"></i><span>No-show recovery</span><b id="legNoshow" class="roi-big-num">0</b></li>
+            <li id="legRetenRow"><i class="sw sw--reten"></i><span>Retention <em>Own</em></span><b id="legReten" class="roi-big-num">0</b></li>
+            <li><i class="sw sw--lost"></i><span>Never reached</span><b id="legLost" class="roi-big-num">0</b></li>
+          </ul>
+          <figcaption id="flow-cap" class="delta">
+            <b id="beforeBookings" class="roi-big-num">0</b> booked now
+            <span class="delta__arw" aria-hidden="true">&rarr;</span>
+            <b id="afterBookings" class="roi-big-num">0</b> with FawrAI
+            <span class="delta__rev">AED <span id="beforeRevenue" class="roi-big-num">0</span> &rarr; AED <span id="afterRevenue" class="roi-big-num">0</span> / mo</span>
+          </figcaption>
+        </figure>
 
-      <div style="background: var(--fawr-offwhite-2); border: 1px solid rgba(13,33,55,0.07); border-radius: var(--radius-md); overflow: hidden;">
-        <button id="breakdownToggle" class="accordion-toggle" style="padding: 16px 24px; width: 100%; background: none; border: none; font: inherit;">
-          <div class="eyebrow" style="margin: 0;">Where the bookings come from</div>
-          <span id="breakdownLabel" style="font-family: var(--font-body); font-size: 12px; color: var(--fawr-sage);">Show</span>
-        </button>
-        <div id="breakdownPanel" class="breakdown-panel">
-          <div style="padding: 0 24px 16px; border-top: 1px solid rgba(13,33,55,0.06);">
-            <div class="breakdown-row">
-              <span style="font-family: var(--font-body); font-size: 13px; color: var(--fawr-charcoal);">Lead gap recovery</span>
-              <span style="font-family: var(--font-display); font-size: 15px; font-weight: 300; color: var(--fawr-navy);">+<span id="bdGap" class="roi-big-num">0</span></span>
-            </div>
-            <div class="breakdown-row">
-              <span style="font-family: var(--font-body); font-size: 13px; color: var(--fawr-charcoal);">No-show recovery</span>
-              <span style="font-family: var(--font-display); font-size: 15px; font-weight: 300; color: var(--fawr-navy);">+<span id="bdNoshow" class="roi-big-num">0</span></span>
-            </div>
-            <div id="ownRows" class="own-rows" hidden>
-              <div class="breakdown-row">
-                <span style="font-family: var(--font-body); font-size: 13px; color: var(--fawr-charcoal);">Client retention<span class="tag-own">OWN</span></span>
-                <span style="font-family: var(--font-display); font-size: 15px; font-weight: 300; color: var(--fawr-navy);">+<span id="bdRetention" class="roi-big-num">0</span></span>
+        <div class="drawer reveal">
+          <button id="breakdownToggle" class="drawer__toggle" type="button">
+            <span class="label label--sm">Where the bookings come from</span>
+            <span id="breakdownLabel" class="drawer__state">Show</span>
+          </button>
+          <div id="breakdownPanel" class="drawer__panel">
+            <div class="drawer__body">
+              <div class="row"><span>Lead gap recovery</span><span class="row__v">+<span id="bdGap" class="roi-big-num">0</span></span></div>
+              <div class="row"><span>No-show recovery</span><span class="row__v">+<span id="bdNoshow" class="roi-big-num">0</span></span></div>
+              <div id="ownRows" class="own-rows" hidden>
+                <div class="row"><span>Client retention <i class="tag-own">Own</i></span><span class="row__v">+<span id="bdRetention" class="roi-big-num">0</span></span></div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div style="background: var(--fawr-offwhite-2); border: 1px solid rgba(13,33,55,0.07); border-radius: var(--radius-md); padding: 18px 24px;">
-        <div class="breakdown-row">
-          <span style="font-family: var(--font-body); font-size: 13px; color: var(--fawr-charcoal);">Setup fee <span style="color: var(--fawr-sage); font-size: 11px;">(one-time)</span></span>
-          <span style="font-family: var(--font-display); font-size: 15px; font-weight: 300; color: var(--fawr-navy);">AED <span id="feeSetup" class="roi-big-num">0</span></span>
+        <div class="fees reveal">
+          <div class="row"><span>Setup fee <i>one-time</i></span><span class="row__v">AED <span id="feeSetup" class="roi-big-num">0</span></span></div>
+          <div class="row"><span>Subscription <i>monthly</i></span><span class="row__v">AED <span id="feeMonthly" class="roi-big-num">0</span></span></div>
         </div>
-        <div class="breakdown-row">
-          <span style="font-family: var(--font-body); font-size: 13px; color: var(--fawr-charcoal);">Subscription <span style="color: var(--fawr-sage); font-size: 11px;">(monthly)</span></span>
-          <span style="font-family: var(--font-display); font-size: 15px; font-weight: 300; color: var(--fawr-navy);">AED <span id="feeMonthly" class="roi-big-num">0</span></span>
-        </div>
-      </div>
 
-      <p id="ownNote" style="font-family: var(--font-body); font-size: 11px; color: var(--fawr-sage); font-style: italic; line-height: 1.6; margin: 0; padding: 0 4px;" hidden>Own compounds over time. Retention gains grow each month as FawrAI builds your client history.</p>
+        <p id="ownNote" class="own-note" hidden>Own compounds. Retention gains grow each month as FawrAI builds your client history.</p>
 
-      <a href="https://fawrai.com#contact" class="roi-cta" style="display: block; background: var(--fawr-navy); color: var(--fawr-offwhite); text-align: center; font-family: var(--font-body); font-size: 14px; font-weight: 400; padding: 14px 24px; border-radius: var(--radius-sm); letter-spacing: 0.01em;">Book a strategy call</a>
+        <a href="https://fawrai.com/#contact" class="btn btn--primary calc__cta reveal">Book a consultation</a>
+      </aside>
     </div>
+
+    <p class="disclaimer reveal">
+      <strong>Projected figures only.</strong> These estimate what a settled, optimised system could produce over time, not results in the first weeks, based on the numbers you enter and the conservative model described above. It is not a forecast, a quote, or a guarantee of results. Actual performance varies with your clinic&rsquo;s treatments, pricing, capacity, team and market. Nothing shown here forms part of any agreement.
+    </p>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="foot__inner">
+    <img src="logo-light-cropped.png" alt="FawrAI" width="88" height="15" class="foot__logo">
+    <p class="foot__meta">
+      <a href="https://fawrai.com/">fawrai.com</a>
+      <span>Dubai, UAE</span>
+      <span>&copy; 2026 FawrAI</span>
+    </p>
   </div>
-</div>
+</footer>
 
-<!-- FOOTER -->
-<div style="background: var(--fawr-navy); border-top: 1px solid rgba(255,255,255,0.06); padding: 28px 48px; display: flex; align-items: center; justify-content: space-between;">
-  <a href="https://fawrai.com" aria-label="FawrAI home"><img src="logo-light.png?v=2" alt="FawrAI" style="height:20px;width:auto;margin-left:-4px;"></a>
-  <span style="font-family: var(--font-body); font-size: 11px; color: rgba(255,255,255,0.3);">fawrai.com &middot; Dubai, UAE &middot; 2026</span>
-</div>
-
-<script src="roi.js"></script>
+<script src="roi.js" defer></script>
 </body>
 </html>
