@@ -33,10 +33,10 @@
 }
 .gate__inner {
   position: relative; width: 100%; max-width: 360px;
-  padding: 0 24px; text-align: left;
+  padding: 0 24px; text-align: center;
 }
-.gate__logo { height: 16px; width: auto; margin: 0 0 40px; opacity: 0.92; }
-.gate .wm { padding-left: 0; }        /* flush-left with the lines below */
+.gate__logo { height: 16px; width: auto; margin: 0 auto 16px; opacity: 0.92; }
+.gate .wm { display: inline-block; padding-left: 0; margin-bottom: 16px; }  /* sits right above the label, centred */
 .gate .eyebrow { margin-bottom: 20px; }
 /* headline removed from view — kept in the DOM for screen readers / the dialog label */
 .gate h1 {
@@ -66,9 +66,9 @@
   color: #E0A08A;
 }
 .gate__note {
-  margin: 24px 0 0;
-  font-family: var(--f-mono); font-size: 10.5px; letter-spacing: 0.02em;
-  color: rgba(255,255,255,0.32);
+  margin: 22px 0 0;
+  font-family: var(--f-body); font-style: italic; font-size: 11px; letter-spacing: 0;
+  color: rgba(255,255,255,0.4);
 }
 
 /* ============================================================
@@ -170,15 +170,15 @@ input[type=range]:active::-moz-range-thumb { transform: scale(1.06); }
 
 /* ---- healthy-range status line ---- */
 .healthy {
-  margin: 16px 0 0; padding-left: 18px; position: relative;
-  font-size: 0.85rem; line-height: 1.5; color: var(--ink-2);
+  margin: 14px 0 0; padding-left: 15px; position: relative;
+  font-size: 0.72rem; font-style: italic; line-height: 1.5; color: var(--ink-3);
 }
 .healthy::before {
   content: ""; position: absolute; left: 0; top: 0.5em;
-  width: 7px; height: 7px; border-radius: 50%; background: var(--sage);
+  width: 6px; height: 6px; border-radius: 50%; background: var(--sage);
   transition: background var(--dur) var(--ease);
 }
-.healthy #healthyRate { font-family: var(--f-mono); font-weight: 500; color: var(--navy); }
+.healthy #healthyRate { font-family: var(--f-mono); font-style: normal; font-weight: 500; color: var(--ink-2); }
 .healthy.low::before { background: var(--status-danger, #B5554A); }
 .healthy.low { color: #8f4a41; }
 .healthy.healthy::before { background: var(--sage-onlight); }

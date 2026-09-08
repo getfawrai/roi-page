@@ -153,22 +153,34 @@ h2 {
   transform: scaleX(0); transform-origin: right;
   transition: transform 300ms var(--ease);
 }
-.btn:hover::after { transform: scaleX(1); transform-origin: left; }
 .btn:active { transform: translateY(1px); }
 .btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 .btn__arrow { display: inline-block; transition: transform var(--dur) var(--ease); }
-.btn:hover .btn__arrow { transform: translateX(4px); }
 
 .btn--primary { --bg: var(--navy); --fg: var(--on-navy); --wipe: var(--gold); }
-.btn--primary:hover { color: var(--navy); }
 .btn--gold { --bg: var(--gold); --fg: var(--navy); --wipe: var(--navy); }
-.btn--gold:hover { color: var(--gold); }
 .btn--onnavy-ghost { --bg: transparent; --fg: var(--on-navy); --bd: rgba(255,255,255,0.3); --wipe: rgba(255,255,255,0.10); }
-.btn--onnavy-ghost:hover { --bd: rgba(255,255,255,0.7); color: var(--on-navy); }
+
+/* The fill-wipe and arrow nudge are a pointer affordance only. On touch they
+   get triggered half-way by taps and swipes and look broken, so gate them
+   behind a real hover-capable pointer. Touch just gets the solid button + a
+   quick :active press. */
+@media (hover: hover) {
+  .btn:hover::after { transform: scaleX(1); transform-origin: left; }
+  .btn:hover .btn__arrow { transform: translateX(4px); }
+  .btn--primary:hover { color: var(--navy); }
+  .btn--gold:hover { color: var(--gold); }
+  .btn--onnavy-ghost:hover { --bd: rgba(255,255,255,0.7); color: var(--on-navy); }
+}
+@media (hover: none) {
+  .btn::after { display: none; }
+  .btn--primary:active { background: var(--gold); color: var(--navy); }
+  .btn--gold:active { background: var(--navy); color: var(--gold); }
+  .btn--onnavy-ghost:active { --bd: rgba(255,255,255,0.7); background: rgba(255,255,255,0.08); }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .btn::after { transition: none; }
-  .btn:hover .btn__arrow { transform: none; }
 }
 
 /* ============================================================
@@ -429,6 +441,15 @@ h1 span { color: var(--on-navy-dim); display: block; margin-bottom: 0.12em; }
   font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--sage-onlight); margin-bottom: 7px;
 }
+/* ---------- headband: alternating sections carry their headline on navy ---------- */
+.headband {
+  background: var(--navy);
+  border-radius: 4px;
+  padding: clamp(24px, 3.5vw, 38px) clamp(22px, 4vw, 40px);
+  margin-bottom: clamp(34px, 5vw, 52px);
+}
+.headband .label { margin-bottom: 0; }
+.headband h2 { margin-top: 14px; max-width: 24ch; }
 
 /* --- is / is not --- */
 .isnot {
@@ -484,58 +505,53 @@ h1 span { color: var(--on-navy-dim); display: block; margin-bottom: 0.12em; }
 .msg--out time { color: var(--on-navy-dim); }
 .js .thread .msg { opacity: 0; transform: translateY(6px); }
 .js .thread .msg.show { opacity: 1; transform: none; transition: opacity 260ms var(--ease), transform 260ms var(--ease); }
-.thread.typing::after {
+/* The typing row is always in the layout (just transparent) so the thread
+   never changes height as messages play in — otherwise the spine labels,
+   positioned by percentage of the page, jitter while the chat animates. */
+.thread::after {
   content: "typing…"; align-self: flex-end;
-  font-family: var(--f-mono); font-size: 10px; color: var(--ink-3);
-  padding: 2px 4px;
+  font-family: var(--f-mono); font-size: 10px; color: transparent;
+  padding: 2px 4px; transition: color 160ms var(--ease);
 }
+.thread.typing::after { color: var(--ink-3); }
 .thread__cap {            /* section closing line — matches .prose--pull / .panel__line */
   font-family: var(--f-display); font-weight: 400;
   font-size: 1.1rem; line-height: 1.45; letter-spacing: -0.01em;
   color: var(--navy); max-width: 34ch; margin: 40px 0 0;
 }
 
-/* --- economics panel (navy inset) --- */
-.panel {
-  background: var(--navy); color: var(--on-navy);
-  border-radius: 4px;
-  padding: clamp(36px, 5vw, 68px);
-}
+/* --- economics figures --- */
 .h2--onnavy { color: var(--on-navy); }
 .figures {
-  list-style: none; margin: 40px 0 0; padding: 0;
+  list-style: none; margin: 44px 0 0; padding: 0;
   display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px;
-  background: var(--line-dark); border: 1px solid var(--line-dark);
+  background: var(--line); border: 1px solid var(--line);
 }
-.figures li { background: var(--navy); padding: 24px 22px; }
-/* minimal stagger: each figure fades in as the panel scrolls into view */
-.js .figures li { opacity: 0; }
-.js .panel.in .figures li { opacity: 1; transition: opacity 520ms var(--ease); }
-.js .panel.in .figures li:nth-child(1) { transition-delay: 60ms; }
-.js .panel.in .figures li:nth-child(2) { transition-delay: 160ms; }
-.js .panel.in .figures li:nth-child(3) { transition-delay: 260ms; }
-.js .panel.in .figures li:nth-child(4) { transition-delay: 360ms; }
+.figures li { background: var(--paper); padding: 24px 22px; }
+/* minimal stagger: the grid itself stays put, each figure fades in one by one */
+.js .figures.reveal { opacity: 1; transform: none; }
+.js .figures.reveal li { opacity: 0; }
+.js .figures.reveal.in li { opacity: 1; transition: opacity 520ms var(--ease); }
+.js .figures.reveal.in li:nth-child(1) { transition-delay: 60ms; }
+.js .figures.reveal.in li:nth-child(2) { transition-delay: 160ms; }
+.js .figures.reveal.in li:nth-child(3) { transition-delay: 260ms; }
+.js .figures.reveal.in li:nth-child(4) { transition-delay: 360ms; }
 .figures b {
   display: block; font-family: var(--f-display); font-weight: 400;
-  font-size: 1.3rem; letter-spacing: -0.015em; color: var(--on-navy);
+  font-size: 1.3rem; letter-spacing: -0.015em; color: var(--navy);
 }
 .figures span {
   display: block; margin-top: 8px;
-  font-size: 0.85rem; color: var(--on-navy-dim); line-height: 1.5;
-}
-.panel__line {            /* section closing line — same as .prose--pull, on navy */
-  margin: 40px 0 0; max-width: 34ch;
-  font-family: var(--f-display); font-weight: 400; font-size: 1.1rem;
-  line-height: 1.45; letter-spacing: -0.01em; color: var(--on-navy);
+  font-size: 0.85rem; color: var(--ink-2); line-height: 1.5;
 }
 .panel__link {
   display: inline-block; margin-top: 26px;
   font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.06em;
-  color: var(--gold); text-decoration: none;
-  border-bottom: 1px solid rgba(212,175,110,0.4); padding-bottom: 3px;
-  transition: border-color var(--dur) var(--ease);
+  color: var(--navy); text-decoration: none;
+  border-bottom: 1px solid var(--gold); padding-bottom: 3px;
+  transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease);
 }
-.panel__link:hover { border-color: var(--gold); }
+.panel__link:hover { color: var(--sage-onlight); border-color: var(--sage-onlight); }
 
 /* --- checks --- */
 .checks { list-style: none; margin: 40px 0 28px; padding: 0; max-width: var(--measure); }
@@ -558,9 +574,8 @@ h1 span { color: var(--on-navy-dim); display: block; margin-bottom: 0.12em; }
 .cta {
   display: grid; grid-template-columns: 1fr 1fr; gap: 56px;
   align-items: start;
-  border-top: 1px solid var(--line); padding-top: clamp(48px, 7vw, 72px);
 }
-.cta__copy h2 { margin: 18px 0 18px; }
+.cta__copy p:first-child { margin-top: 0; }
 .cta__copy p { max-width: 38ch; color: var(--charcoal); }
 .cta__alt { font-family: var(--f-mono); font-size: 12px; color: var(--ink-2); margin-top: 22px; }
 .cta__alt a { color: var(--sage-onlight); }
@@ -632,16 +647,20 @@ h1 span { color: var(--on-navy-dim); display: block; margin-bottom: 0.12em; }
   .nav__burger { display: block; }
 
   :root { --gutter: 0px; --pad: 22px; }
-  .stage { padding-left: 38px; padding-right: 22px; }
-  /* Mobile keeps the desktop spine: the line that fills, the marker that
-     travels, and the stop labels — the labels just turn to run vertically
-     alongside the line so they cost almost no horizontal space. */
-  .spine { left: 6px; width: 3px; }
+  /* Mobile keeps the desktop spine, pushed hard to the left edge so the
+     content column gets nearly the full width. The line fills, the marker
+     travels, and the stop labels run vertically right beside it. */
+  .stage { padding-left: 42px; padding-right: 20px; }
+  .spine { left: 3px; width: 3px; }
   .spine__line, .spine__fill { width: 3px; }
+  /* phone: let the fill and marker track scroll 1:1 — the JS repaints every
+     frame, so the 120ms transition only lags behind momentum scrolling and
+     makes the line look like it is dragging. */
+  .spine__fill, .spine__dot { transition: none; }
   .spine__stops li {
     writing-mode: vertical-rl; text-orientation: sideways;
     transform: rotate(180deg);           /* read by tilting the head left */
-    left: 12px;
+    left: 9px;
     font-size: 9px; letter-spacing: 0.03em; line-height: 1;
     white-space: nowrap;
   }
@@ -680,6 +699,7 @@ h1 span { color: var(--on-navy-dim); display: block; margin-bottom: 0.12em; }
   .js .reveal { opacity: 1; transform: none; }
   .js .thread .msg { opacity: 1; transform: none; }
   .js .figures li { opacity: 1; }
+  .js .panel .contrast__pair { opacity: 1; }
   .gap__bar i { transform: scaleX(1); }
   .hero__log-text.type::after { display: none; }
 }
