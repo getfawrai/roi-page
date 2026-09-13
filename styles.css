@@ -617,7 +617,7 @@ h1 span { color: var(--on-navy-dim); display: block; margin-bottom: 0.12em; }
   display: grid; gap: 14px;
 }
 .foot__logo { opacity: 0.9; }
-.foot__tag { margin: 4px 0 0; font-size: 0.9rem; color: var(--on-navy); }
+.foot__tag { margin: 4px 0 0; font-size: 0.8rem; font-style: italic; color: var(--on-navy-dim); }
 .foot__meta {
   display: flex; flex-wrap: wrap; gap: 22px; margin: 10px 0 0;
   font-family: var(--f-mono); font-size: 11.5px; letter-spacing: 0.04em;
@@ -647,6 +647,10 @@ h1 span { color: var(--on-navy-dim); display: block; margin-bottom: 0.12em; }
   .nav__burger { display: block; }
 
   :root { --gutter: 0px; --pad: 22px; }
+  /* Match the hero lead paragraph to the other body-copy sections (e.g. the
+     leak section's "The enquiries arrive..."), which sit at the flat 1rem
+     body size — the hero's desktop clamp() reads slightly larger on phone. */
+  .hero__lead { font-size: 1rem; }
   /* Mobile keeps the desktop spine, pushed hard to the left edge so the
      content column gets nearly the full width. The line fills, the marker
      travels, and the stop labels run vertically right beside it. */
