@@ -4,19 +4,37 @@
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   document.documentElement.classList.add("js");
 
+  /* nav goes solid once you leave the top */
+  var navEl = document.getElementById("nav");
+  function paintNav() { if (navEl) navEl.classList.toggle("is-stuck", window.scrollY > 24); }
+  paintNav();
+  window.addEventListener("scroll", paintNav, { passive: true });
+
   /* ---------------- Scroll reveal ---------------- */
   (function () {
-    var revs = document.querySelectorAll(".reveal");
-    if (reduce || !("IntersectionObserver" in window)) {
+    var revs = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+    if (reduce) {
       revs.forEach(function (el) { el.classList.add("in"); });
       return;
     }
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) { entry.target.classList.add("in"); io.unobserve(entry.target); }
-      });
-    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
-    revs.forEach(function (el) { io.observe(el); });
+    var ticking = false;
+    function paint() {
+      ticking = false;
+      var vh = window.innerHeight;
+      for (var i = revs.length - 1; i >= 0; i--) {
+        var r = revs[i].getBoundingClientRect();
+        if (r.top < vh * 0.92 && r.bottom > 0) {
+          revs[i].classList.add("in");
+          revs.splice(i, 1);
+        }
+      }
+    }
+    function request() {
+      if (!ticking) { ticking = true; requestAnimationFrame(paint); }
+    }
+    paint();
+    window.addEventListener("scroll", request, { passive: true });
+    window.addEventListener("resize", request, { passive: true });
   })();
 
   /* ---------------- Access gate ---------------- */
@@ -47,22 +65,18 @@
   });
 
   /* ---------------- Pricing engine ---------------- */
-  var P = {
-    own:     { setup: [3000, 3500, 4500, 6000], monthly: [3500, 5000, 7000, 9500] },
-    convert: { setup: [2000, 2500, 3500, 4500], monthly: [2500, 3500, 5000, 6500] }
-  };
-  var TIER_LABELS = ["Tier 1", "Tier 2", "Tier 3", "Tier 4"];
-  var TIER_RANGES = ["0-200", "201-400", "401-600", "601+"];
+  // Monthly rate per block. A part block is charged as a full one. Setup fee is excluded.
+  var RATE = { own: 1999, convert: 1799 };
 
-  function getTier(leads) {
-    return leads <= 200 ? 0 : leads <= 400 ? 1 : leads <= 600 ? 2 : 3;
+  function blocksFor(leads) {
+    return leads > 0 ? Math.ceil(leads / 100) : 0;
   }
 
   var HEALTHY_LOW = 0.25;
   var HEALTHY_HIGH = 0.40;
 
   function calc(leads, booked, price, product) {
-    var ti = getTier(leads);
+    var blocks = blocksFor(leads);
 
     var gap = Math.max(0, leads - booked);
     var s1bk = Math.round(gap * 0.20);
@@ -81,20 +95,19 @@
     var recoveredRev = product === "own" ? s1rev + s2rev + s3rev : s1rev + s2rev;
     var revWith = revWithout + recoveredRev;
 
-    var mo = P[product].monthly[ti];
-    var setup = P[product].setup[ti];
+    var mo = RATE[product] * blocks;
     var roi = mo > 0 && recoveredRev > 0 ? Math.round(recoveredRev / mo) : 0;
 
     var paybackBookings = price > 0 ? Math.ceil(mo / price) : 0;
     var surplusBookings = recoveredBk - paybackBookings;
 
     return {
-      tier: ti,
+      blocks: blocks,
       gap: gap, s1bk: s1bk, s1rev: s1rev,
       noShows: noShows, s2bk: s2bk, s2rev: s2rev,
       attended: attended, s3bk: s3bk, s3rev: s3rev,
       revWithout: revWithout, recoveredBk: recoveredBk, recoveredRev: recoveredRev, revWith: revWith,
-      mo: mo, setup: setup, roi: roi,
+      mo: mo, roi: roi,
       paybackBookings: paybackBookings, surplusBookings: surplusBookings
     };
   }
@@ -109,7 +122,6 @@
     leadsValue: document.getElementById("leadsValue"),
     bookedValue: document.getElementById("bookedValue"),
     priceValue: document.getElementById("priceValue"),
-    tierBadge: document.getElementById("tierBadge"),
     healthyBadge: document.getElementById("healthyBadge"),
     healthyRate: document.getElementById("healthyRate"),
     healthyLabel: document.getElementById("healthyLabel"),
@@ -117,8 +129,6 @@
     tierOwn: document.getElementById("tierOwn"),
     tierConvertPrice: document.getElementById("tierConvertPrice"),
     tierOwnPrice: document.getElementById("tierOwnPrice"),
-    tierConvertSetup: document.getElementById("tierConvertSetup"),
-    tierOwnSetup: document.getElementById("tierOwnSetup"),
     convertToggle: document.getElementById("convertToggle"),
     convertPanel: document.getElementById("convertPanel"),
     netGain: document.getElementById("netGain"),
@@ -134,7 +144,6 @@
     bdRetention: document.getElementById("bdRetention"),
     ownRows: document.getElementById("ownRows"),
     ownNote: document.getElementById("ownNote"),
-    feeSetup: document.getElementById("feeSetup"),
     feeMonthly: document.getElementById("feeMonthly"),
     breakdownToggle: document.getElementById("breakdownToggle"),
     breakdownPanel: document.getElementById("breakdownPanel"),
@@ -223,7 +232,6 @@
     els.bookedValue.textContent = booked;
     els.priceValue.textContent = fmt(price);
 
-    els.tierBadge.textContent = TIER_LABELS[c.tier] + " · " + TIER_RANGES[c.tier];
 
     var rate = leads > 0 ? booked / leads : 0;
     els.healthyRate.textContent = Math.round(rate * 100) + "%";
@@ -246,8 +254,6 @@
     var ownAtTier = calc(leads, booked, price, "own");
     animateNumber(els.tierConvertPrice, convertAtTier.mo);
     animateNumber(els.tierOwnPrice, ownAtTier.mo);
-    animateNumber(els.tierConvertSetup, convertAtTier.setup);
-    animateNumber(els.tierOwnSetup, ownAtTier.setup);
     els.tierConvert.classList.toggle("active", !isOwn);
     els.tierOwn.classList.toggle("active", isOwn);
 
@@ -274,7 +280,6 @@
     animateNumber(els.bdNoshow, c.s2bk);
     animateNumber(els.bdRetention, c.s3bk);
 
-    animateNumber(els.feeSetup, c.setup);
     animateNumber(els.feeMonthly, c.mo);
 
     if (isOwn) {
